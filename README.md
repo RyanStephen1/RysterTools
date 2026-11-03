@@ -5,7 +5,7 @@ This repository contains the Operations Desk homepage and the complete ADK Finan
 | Path | Purpose |
 | --- | --- |
 | apps/home | Static homepage. Deploy this folder as the root of your domain. |
-| apps/finance | ADK Finance. Deploy as a separate Vite app, for example at a finance subdomain. |
+| apps/finance | ADK Finance Vite app served at /finance/ by the main deployment. |
 
 ## Run locally
 
@@ -17,7 +17,7 @@ Open apps/home/index.html in a browser. For finance, run these commands from app
 
 Set the project URL and public anon key in .env.local before signing in. Use the existing Supabase project to keep access to your existing finance records. For a fresh database, follow the setup guides in apps/finance. The finance production build command is npm run build and its output is dist.
 
-After deploying finance, replace the GitHub URL on its homepage card with the deployed app URL. Document Control, Procurement & Materials, and CV Tracking are reserved homepage entries and need their own implementations or live app URLs.
+Document Control, Procurement & Materials, and CV Tracking are reserved homepage entries and need their own implementations or live app URLs.
 
 ## Shared Supabase
 
@@ -31,4 +31,4 @@ Create an empty GitHub repository and use the commands GitHub shows for pushing 
 
 ## Deploy the homepage on Vercel
 
-Import RyanStephen1/RysterTools and deploy the main branch. Leave Root Directory at the repository root so Vercel reads vercel.json and serves apps/home. In the project's Domains settings, add www.ryster.xyz and use the DNS records Vercel shows for that domain. If the domain is already assigned to another Vercel project, move it to the homepage project.
+Import RyanStephen1/RysterTools and deploy the main branch. Leave Root Directory at the repository root so Vercel reads vercel.json and builds the homepage and Finance together. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in the Vercel project before deploying. The homepage is served at / and Finance at /finance/. In the project's Domains settings, add www.ryster.xyz and use the DNS records Vercel shows for that domain. If the domain is already assigned to another Vercel project, move it to the homepage project.

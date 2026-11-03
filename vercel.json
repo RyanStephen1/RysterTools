@@ -1,5 +1,7 @@
 {
   "framework": null,
-  "buildCommand": "node --version",
-  "outputDirectory": "apps/home"
+  "installCommand": "npm --prefix apps/finance ci",
+  "buildCommand": "npm --prefix apps/finance run build -- --base=/finance/ && node build.mjs",
+  "outputDirectory": "dist",
+  "trailingSlash": true
 }
