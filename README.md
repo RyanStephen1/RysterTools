@@ -28,3 +28,7 @@ A common Supabase project provides a common identity store. Separate frontend or
 ## Push to a new GitHub repository
 
 Create an empty GitHub repository and use the commands GitHub shows for pushing an existing repository. Start from this folder. Commit the source and example environment files. Actual environment files and generated dependencies are excluded by the root ignore file.
+
+## Deploy the homepage on Vercel
+
+Import RyanStephen1/RysterTools and deploy the main branch. Leave Root Directory at the repository root so Vercel reads vercel.json and serves apps/home. In the project's Domains settings, add www.ryster.xyz and use the DNS records Vercel shows for that domain. If the domain is already assigned to another Vercel project, move it to the homepage project.
