@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@layer base {
+  body {
+    @apply font-sans antialiased bg-[#F8F9FA] text-[#1A1A1A];
+  }
+}
+
+@layer utilities {
+  .brutalist-shadow {
+    box-shadow: 8px 8px 0px 0px rgba(0,0,0,0.05);
+  }
+}
+
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  header,
+  .no-print,
+  .no-export,
+  button,
+  nav,
+  input,
+  select,
+  textarea {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  /* Make sure borders print sharply */
+  .border-4 {
+    border-width: 2px !important;
+  }
+  
+  .border-2 {
+    border-width: 1px !important;
+  }
+
+  .brutalist-shadow {
+    box-shadow: none !important;
+  }
+}

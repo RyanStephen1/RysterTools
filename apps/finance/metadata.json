@@ -1,0 +1,8 @@
+{
+  "name": "ADK Expense Tracker",
+  "description": "Responsive ADK expense tracking and withdrawal summary system with real-time review dashboard and multi-user administration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
