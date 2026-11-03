@@ -34,3 +34,5 @@ Create an empty GitHub repository and use the commands GitHub shows for pushing 
 Import RyanStephen1/RysterTools and deploy the main branch. Leave Root Directory at the repository root so Vercel reads vercel.json and builds the homepage and Finance together. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in the Vercel project before deploying. The homepage is served at / and Finance at /finance/. In the project's Domains settings, add www.ryster.xyz and use the DNS records Vercel shows for that domain. If the domain is already assigned to another Vercel project, move it to the homepage project.
 
 See [shared Supabase setup](supabase/README.md) for the membership migration and cutover steps.
+
+[ADK HR ERP source](apps/hr) is included in this repository. See its README for the shared Supabase integration status.

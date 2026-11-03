@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+reportlab
+pillow
+pydantic
+python-multipart
+httpx
+openpyxl
+playwright

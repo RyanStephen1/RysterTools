@@ -1,0 +1,10 @@
+*.db
+*.db-*
+*.sqlite*
+*.xlsx
+*.xls
+*.env
+uploads/
+data/
+__pycache__/
+.venv/
