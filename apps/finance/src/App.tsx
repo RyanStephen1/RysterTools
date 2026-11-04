@@ -147,6 +147,8 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [voucherStatus, setVoucherStatus] = useState<ExpenseStatus | 'ALL'>('ALL');
+  const [voucherSearch, setVoucherSearch] = useState('');
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [selectedExpenseIds, setSelectedExpenseIds] = useState<string[]>([]);
@@ -613,6 +615,14 @@ export default function App() {
 
   const logout = () => supabase.auth.signOut();
 
+  const voucherQuery = voucherSearch.trim().toLowerCase();
+  const visibleVouchers = expenses.filter(expense =>
+    (voucherStatus === 'ALL' || expense.status === voucherStatus) &&
+    [expense.cvNo, expense.payee, expense.particulars].some(value =>
+      (value ?? '').toLowerCase().includes(voucherQuery)
+    )
+  );
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -629,7 +639,7 @@ export default function App() {
 
   // Calculations
   const totalPayables = useMemo(() =>
-    expenses.reduce((sum, exp) => sum + exp.amount, 0),
+    expenses.reduce((sum, exp) => sum + (exp.status === 'CANCELLED' ? 0 : exp.amount), 0),
     [expenses]);
 
   const filteredBankTransactions = useMemo(() => {
@@ -1311,7 +1321,7 @@ export default function App() {
     if (isAllSelected) {
       setSelectedExpenseIds([]);
     } else {
-      setSelectedExpenseIds(expenses.map(x => x.id));
+      setSelectedExpenseIds(visibleVouchers.map(x => x.id));
     }
   }
 
@@ -1319,7 +1329,7 @@ export default function App() {
     if (selectedExpenseIds.length === 0) return;
 
     // Safety Guard: Filter selection to ONLY include IDs that are physically visible on today's list!
-    const visibleIds = expenses.map(e => e.id);
+    const visibleIds = visibleVouchers.map(e => e.id);
     const validSelectionIds = selectedExpenseIds.filter(id => visibleIds.includes(id));
 
     if (validSelectionIds.length === 0) {
@@ -1759,7 +1769,7 @@ export default function App() {
                   exit={{ height: 0, opacity: 0 }}
                   className="mb-12 overflow-hidden"
                 >
-                  <Dashboard expenses={allExpenses} />
+                  <Dashboard expenses={allExpenses.filter(expense => expense.status !== 'CANCELLED')} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1900,6 +1910,32 @@ export default function App() {
                 </div>
               </div>
 
+              <section className="no-export border-y border-slate-200 bg-slate-50 px-4 py-4 md:px-6" aria-label="Cash voucher tracking">
+                <h3 className="text-sm font-black uppercase tracking-wide">Cash voucher tracking</h3>
+                <div className="mt-3 flex flex-wrap items-end gap-3">
+                  <label className="flex flex-col gap-1 text-xs font-bold">
+                    Search vouchers
+                    <input className="border border-black bg-white p-2" value={voucherSearch}
+                      placeholder="Voucher no., payee, or particulars"
+                      onChange={event => setVoucherSearch(event.target.value)} />
+                  </label>
+                  <label className="flex flex-col gap-1 text-xs font-bold">
+                    Status
+                    <select className="border border-black bg-white p-2" value={voucherStatus}
+                      onChange={event => setVoucherStatus(event.target.value as ExpenseStatus | 'ALL')}>
+                      <option value="ALL">All statuses ({expenses.length})</option>
+                      {Object.entries(expenseStatusConfig).map(([status, config]) => (
+                        <option key={status} value={status}>
+                          {config.label} ({expenses.filter(expense => expense.status === status).length})
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <span role="status" className="text-xs text-slate-600">
+                    Showing {visibleVouchers.length} of {expenses.length} vouchers for the selected date
+                  </span>
+                </div>
+              </section>
               <SignerEditor {...signerSettings} />
 
               <div className="overflow-x-auto">
@@ -1925,7 +1961,7 @@ export default function App() {
                   </thead>
                   <tbody className="text-sm font-bold divide-y divide-[#F3F4F6] hidden md:table-row-group">
                     <AnimatePresence mode="popLayout">
-                      {expenses.map((expense, index) => (
+                      {visibleVouchers.map((expense, index) => (
                         <motion.tr
                           key={expense.id}
                           initial={{ opacity: 0 }}
@@ -2005,7 +2041,7 @@ export default function App() {
               {/* Mobile Cards View for Expenses */}
               <div className="md:hidden flex flex-col divide-y divide-[#F3F4F6]">
                 <AnimatePresence mode="popLayout">
-                  {expenses.map((expense, index) => (
+                  {visibleVouchers.map((expense, index) => (
                     <motion.div
                       key={expense.id}
                       initial={{ opacity: 0 }}
@@ -2661,17 +2697,18 @@ function SummaryRow({ label, value, isNegative, isBold, highlight, large, classN
   );
 }
 
-function StatusBadge({ status }: { status: ExpenseStatus }) {
-  const configs = {
-    APPROVED: { class: "bg-[#D1FAE5] text-[#047857]", label: "Approved" },
-    PENDING: { class: "bg-[#FEF3C7] text-[#B45309]", label: "Pending" },
-    REJECTED: { class: "bg-[#FFE4E6] text-[#BE123C]", label: "Declined" },
-  };
-  const config = configs[status];
+const expenseStatusConfig = {
+  APPROVED: { class: 'bg-emerald-100 text-emerald-800', label: 'Approved' },
+  PENDING: { class: 'bg-amber-100 text-amber-800', label: 'Pending' },
+  REJECTED: { class: 'bg-rose-100 text-rose-800', label: 'Declined' },
+  CANCELLED: { class: 'bg-slate-200 text-slate-700', label: 'Cancelled' },
+};
 
+function StatusBadge({ status }: { status: ExpenseStatus }) {
+  const config = expenseStatusConfig[status];
   return (
-    <span className={cn("px-3 py-1 text-[9px] font-black uppercase rounded-full tracking-wider", status === 'APPROVED' ? "bg-[#D1FAE5] text-[#047857]" : status === 'PENDING' ? "bg-[#FEF3C7] text-[#B45309]" : "bg-[#FFE4E6] text-[#BE123C]")}>
-      {status === 'APPROVED' ? "Approved" : status === 'PENDING' ? "Pending" : "Declined"}
+    <span className={cn('px-3 py-1 text-[9px] font-black uppercase rounded-full tracking-wider', config?.class)}>
+      {config?.label ?? status}
     </span>
   );
 }
@@ -2910,6 +2947,7 @@ function ExpenseForm({ initialData, onClose, userId }: { initialData?: Expense |
             <option value="APPROVED">Approved</option>
             <option value="PENDING">Pending Review</option>
             <option value="REJECTED">Declined</option>
+            <option value="CANCELLED">Cancelled</option>
           </select>
         </div>
       </div>

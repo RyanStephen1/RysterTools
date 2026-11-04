@@ -1,4 +1,4 @@
-export type ExpenseStatus = 'APPROVED' | 'PENDING' | 'REJECTED';
+export type ExpenseStatus = 'APPROVED' | 'PENDING' | 'REJECTED' | 'CANCELLED';
 
 export interface Expense {
   id: string;
